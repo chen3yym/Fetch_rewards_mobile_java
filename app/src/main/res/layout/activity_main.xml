@@ -36,7 +36,7 @@
         </com.google.android.material.tabs.TabLayout>
 
         <TableLayout
-            android:id="@+id/tableLayoutForJobOffersListingPage"
+            android:id="@+id/tableLayoutForUserListingPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
