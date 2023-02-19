@@ -39,8 +39,7 @@ public class FetchData extends AsyncTask<String, String, String>
             URL url = new URL(urlToFetch);
 
             urlConnection = (HttpURLConnection) url.openConnection();
-//            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-
+//            InputStream in = new BufferedInputStream(urlConnection.getInputStream())
 //            urlConnection.setRequestMethod("GET");
 //            urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 //            urlConnection.setDoInput(true);
@@ -50,7 +49,7 @@ public class FetchData extends AsyncTask<String, String, String>
             iStream = urlConnection.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
             StringBuilder sb = new StringBuilder();
-//
+
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line);
@@ -60,7 +59,7 @@ public class FetchData extends AsyncTask<String, String, String>
             return json;
 
 
-//            data = (JSONArray) new JSONTokener(IOUtils.toString(new URL(urlToFetch).openStream(), Charset.forName("UTF-8"))).nextValue();
+//          data = (JSONArray) new JSONTokener(IOUtils.toString(new URL(urlToFetch).openStream(), Charset.forName("UTF-8"))).nextValue();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

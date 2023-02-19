@@ -18,6 +18,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -29,7 +31,8 @@ import android.util.Log;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
+import java.util.Collections;
+import java.util.Comparator;
 public class MainActivity extends AppCompatActivity {
 
     String json = "";
@@ -48,16 +51,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-//            ArrayList<JSONObject> temp = new ArrayList<>();
-//
-//            JSONObject json = new JSONObject();
-//            json.put("fromZIPCode","123456");
-//
-//            JSONObject json1 = new JSONObject();
-//            JSONObject fromZIPCode = json1.put("fromZIPCode", "123456");
-//            temp.add(json1);
-//            temp.add(json);
-
             init(list);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -69,46 +62,54 @@ public class MainActivity extends AppCompatActivity {
 
 
     public ArrayList<JSONObject> fetchData() throws IOException {
-//
-        ArrayList<JSONObject> list = new ArrayList<>();
-//        String urlToFetch = "https://fetch-hiring.s3.amazonaws.com/hiring.json";
-        JSONArray data = null;
-//        InputStream iStream = null;
-//        JSONObject jsonObject;
-//        HttpURLConnection urlConnection = null;
-        try {
-//
-//            URL url = new URL(urlToFetch);
-//            urlConnection =(HttpURLConnection) url.openConnection();
-//            urlConnection.setRequestMethod("GET");
-//            urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-////            urlConnection.setDoInput(true);
-//            urlConnection.setConnectTimeout(100000000);
-//            urlConnection.setReadTimeout(100000000);
-//            urlConnection.connect();
-//            iStream = urlConnection.getInputStream();
-//            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-//            StringBuilder sb = new StringBuilder();
-////
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                sb.append(line);
-//            }
-//            br.close();
-            FetchData fd = new FetchData();
-            json = fd.execute("https://fetch-hiring.s3.amazonaws.com/hiring.json").get();
 
+        ArrayList<JSONObject> list = new ArrayList<>();
+        String urlToFetch = "https://fetch-hiring.s3.amazonaws.com/hiring.json";
+        JSONArray data = null;
+        try {
+
+            // run fetchdata class using asynctask, get the execute string data => json
+            FetchData fd = new FetchData();
+            json = fd.execute(urlToFetch).get();
+
+
+            // filter null and empty name
             data = (JSONArray) new JSONParser().parse(json);
             for(int i = 0; i < data.size(); i ++) {
                 JSONObject ob = (JSONObject) data.get(i);
                 if(ob.get("name") != null && ob.get("id") != null && ob.get("listId") != null){
-                list.add(ob);}
+                    if (ob.get("name").equals("")){
+                    }else{
+                        list.add(ob);
+                    }
+                }
             }
+
+
+            // Sort arraylist with two fields in jsonobject
+            Collections.sort(list, new Comparator<JSONObject>() {
+                private static final String KEY_NAME1= "listId";
+                private static final String KEY_NAME2 = "name";
+                @Override
+                public int compare(JSONObject a, JSONObject b) {
+                    String a1 = "";
+                    String b1 = "";
+                    a1 = a.get(KEY_NAME1).toString();
+                    b1 = b.get(KEY_NAME1).toString();
+                    String a2 = "";
+                    String b2 = "";
+                    a2 = a.get(KEY_NAME2).toString();
+                    b2 = b.get(KEY_NAME2).toString();
+                    if (a1.compareTo(b1) == 0) {
+                        return a2.compareTo(b2);
+                    } else {
+                        return a1.compareTo(b1);
+                    }
+                }
+            });
             return list;
-
-
-//            data = (JSONArray) new JSONTokener(IOUtils.toString(new URL(urlToFetch).openStream(), Charset.forName("UTF-8"))).nextValue();
         } catch (Exception e) {
+            // error check tools
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             json =  sw.toString();
@@ -118,9 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-
+// add table header
     private TableRow PrepareTableHeader(){
 
         TableRow header = new TableRow(this);
@@ -143,18 +142,13 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+// add table view which includes the arraylist data
     public void init(ArrayList<JSONObject> list) throws JSONException {
 
         ArrayList<JSONObject> temp = new ArrayList<>();
         TableLayout stk = (TableLayout) findViewById(R.id.tableLayoutForUserListingPage);
         TableRow tableHeader = PrepareTableHeader();
         stk.addView(tableHeader);
-//        JSONObject json = new JSONObject();
-//        json.put("fromZIPCode","123456");
-//
-//        JSONObject json1 = new JSONObject();
-//        json1.put("fromZIPCode", "123456");
-//        temp.add(json1);
 
 
         for (JSONObject j: list){
@@ -164,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
             TextView tvId = new TextView(this);
             tvListId.setText(j.get("listId").toString());
             tvName.setText(j.get("name").toString());
-//            tvName.setText(list.get(0).get("id").toString());
             tvId.setText(j.get("id").toString());
             tr.addView(tvListId);
             tr.addView(tvName);
